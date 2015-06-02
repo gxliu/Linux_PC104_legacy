@@ -1,32 +1,19 @@
-//The includes that are commented out here were all the ones used in various
-//places that offered information on how to write a driver.
-//I'm leaving them here in case it turns out they are needed later for any
-//new features I add to the Driver
-//--Jay Dolan 12-27-06
-
-//#include <linux/kernel.h>
-//#include <linux/config.h>
-//#include <linux/slab.h> //kmalloc
-//#include <linux/fs.h>
-//#include <linux/errno.h> //error codes
-//#include <linux/types.h>
-//#include <linux/init.h>
-//#include <linux/fcntl.h>
-//#include <asm/system.h>
-
-
 #include <linux/module.h>
 #include <linux/proc_fs.h>
+
 #include <linux/ioport.h> //request_region
 #include <linux/cdev.h> //cdev struct and cdev_add etc
 #include <asm/uaccess.h> //copy_from/to_user
 #include <asm/io.h>
 
+#include <linux/interrupt.h>
+#include <linux/sched.h>
+#include <linux/fs.h>
+
 #include "iogen.h"
 
 
-MODULE_LICENSE("GPL"); //this is kind of silly because our code is closer to
-							//public domain than any of the "non tainting" licenses
+MODULE_LICENSE("GPL");
 
 
 typedef struct
@@ -87,7 +74,12 @@ struct file_operations io_gen_fops = {
 	write : io_gen_write,
 	open : io_gen_open,
 	release : io_gen_release,
+#ifdef HAVE_UNLOCKED_IOCTL 
+        
+#else
 	ioctl : io_gen_ioctl
+#endif
+
 };
 
 //cdev stuff
