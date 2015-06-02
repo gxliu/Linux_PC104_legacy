@@ -1,0 +1,16 @@
+#! /bin/sh
+
+if [ -d /usr/src/linux-source-$(uname -r)/ ] ; then
+    sourcedir=/usr/src/linux-source-$(uname -r)/
+elif [ -d /usr/src/linux-headers-$(uname -r)/ ] ; then
+    sourcedir=/usr/src/linux-headers-$(uname -r)/
+else
+    echo "You don't have either the required headers or source directory installed"
+    echo "in /usr/src/linux-source-$(uname -r) or in /usr/src/linux-headers-$(uname -r)"
+    echo "please install with either "
+    echo "Debian:  sudo apt-get install linux-headers-$(uname -r)"
+    echo "CentOS:  Stuff"
+fi
+
+make -C $sourcedir M=`pwd` modules
+
