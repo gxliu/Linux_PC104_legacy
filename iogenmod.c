@@ -64,22 +64,28 @@ int io_gen_open (struct inode *inode, struct file *filp);
 int io_gen_release (struct inode *inode, struct file *filp);
 ssize_t io_gen_read (struct file *filp, char *buf, size_t count, loff_t *f_pos);
 ssize_t io_gen_write (struct file *filp, const char *buf, size_t count, loff_t *f_pos);
+
+#ifdef HAVE_UNLOCKED_IOCTL 
+long io_gen_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);
+#else 
 int io_gen_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg);
+#endif
+
+
 int get_irq (int is_write, int offset, int irq_requested, unsigned char to_clear);
 
 
 //fops structure
 struct file_operations io_gen_fops = {
-	read : io_gen_read,
-	write : io_gen_write,
-	open : io_gen_open,
-	release : io_gen_release,
 #ifdef HAVE_UNLOCKED_IOCTL 
-        
+    .unlocked_ioctl = io_gen_ioctl,
 #else
-	ioctl : io_gen_ioctl
+    .ioctl = io_gen_ioctl,
 #endif
-
+    .read = io_gen_read,
+    .write = io_gen_write,
+    .open = io_gen_open,
+    .release = io_gen_release,
 };
 
 //cdev stuff
@@ -149,8 +155,11 @@ int make_region_request(io_gen_resource resource_requested, struct file *filp)
 	}
 }
 
-
+#ifdef HAVE_UNLOCKED_IOCTL 
+long  io_gen_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+#else 
 int io_gen_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, unsigned long arg)
+#endif
 {
 	io_gen_io_packet iopack;
 	io_gen_resource resource_requested;
