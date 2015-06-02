@@ -344,7 +344,7 @@ int io_gen_ioctl(struct inode *inode, struct file *filp, unsigned int cmd, unsig
 }
 
 
-irqreturn_t iogen_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+irqreturn_t iogen_interrupt(int irq, void *dev_id)
 {
 	unsigned char toss;
 #ifdef IO_GEN_DEBUG_ON
